@@ -1,0 +1,46 @@
+/* Container Design */
+.auth-form-light-custom {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* Form group spacing */
+.auth-form-light-custom .form-group {
+  margin-bottom: 18px;
+}
+
+/* Input and select styling */
+.auth-form-light-custom input,
+.auth-form-light-custom select {
+  height: 48px;
+  border-radius: 8px !important;
+}
+
+/* Button design */
+.auth-form-btn {
+  height: 50px;
+  border-radius: 8px;
+  background: #7e3af2;
+  border: none;
+  width: 100%;
+}
+
+.auth-form-btn:hover {
+  background: #6928d9;
+}
+
+/* Logo size */
+.brand-logo img {
+  width: 120px;
+}
+
+/* Heading style */
+h4 {
+  font-weight: 600;
+  color: #333;
+}
+
+.fw-light {
+  color: #777;
+}
