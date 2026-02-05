@@ -37,27 +37,13 @@ function Attendance() {
       console.log("Attendance Response:", response.data);
       
       // Handle response data structure
-      let data = [];
       if (response.data && response.data.data) {
-        data = response.data.data;
+        setAttendanceData(response.data.data);
       } else if (Array.isArray(response.data)) {
-        data = response.data;
+        setAttendanceData(response.data);
+      } else {
+        setAttendanceData([]);
       }
-      
-      // Show message if future date is selected
-      if (response.data && response.data.message) {
-        setError(response.data.message);
-      }
-      
-      // For monthly/yearly views, filter out employees with no attendance data (0 total days)
-      if (period === "monthly" || period === "yearly") {
-        data = data.filter(item => {
-          const summary = item.summary;
-          return summary && summary.totalDays > 0;
-        });
-      }
-      
-      setAttendanceData(data);
     } catch (err) {
       console.error("Error fetching attendance:", err);
       setError(err.response?.data?.message || "Failed to fetch attendance data. Please try again.");
@@ -164,7 +150,7 @@ function Attendance() {
                       }
                     }}
                     min="2020-01-01"
-                    max={new Date().toISOString().split("T")[0]}
+                    max="2099-12-31"
                   />
                 </div>
                 <div className="col-md-4 d-flex align-items-end">
