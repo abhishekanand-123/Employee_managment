@@ -18,6 +18,7 @@ import EmployeeList from "./pages/employees/EmployeeList";
 import EditEmployee from "./pages/employees/EditEmployee";
 import EmployeeLogin from "./pages/employee/EmployeeLogin";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
+import Attendance from "./pages/attendance/Attendance";
 
 import "./App.css";
 
@@ -61,6 +62,7 @@ function App() {
                 <Route path="/add-employee" element={<AddEmployee />} />
                 <Route path="/employee-list" element={<EmployeeList />} />
                 <Route path="/edit-employee/:id" element={<EditEmployee />} />
+                <Route path="/attendance" element={<Attendance />} />
 
               </Routes>
 

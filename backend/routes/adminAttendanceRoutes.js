@@ -4,27 +4,250 @@ const Attendance = require("../models/Attendance");
 const Employee = require("../models/Employee");
 const { verifyAdmin } = require("../middleware/authMiddleware");
 
-// Get all employees with today's attendance
+// Get all employees with attendance (supports daily/monthly/yearly filter)
 router.get("/employees-attendance", verifyAdmin, async (req, res) => {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const { period, date } = req.query;
     
-    const employees = await Employee.find();
-    const attendanceRecords = await Attendance.find({ date: today });
+    // Default to daily if not specified
+    const filterPeriod = period || "daily";
+    let queryDate = date ? new Date(date) : new Date();
     
-    // Map attendance to employees
-    const employeesWithAttendance = employees.map(emp => {
-      const attendance = attendanceRecords.find(
-        att => att.employeeId.toString() === emp._id.toString()
-      );
+    // Validate date
+    if (isNaN(queryDate.getTime())) {
+      queryDate = new Date();
+    }
+    
+    // Get today's date (set to start of day for comparison)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(queryDate);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    // For daily view: Don't allow future dates - only show past or today's data
+    if (filterPeriod === "daily") {
+      if (selectedDate > today) {
+        // Future date selected - return empty array
+        const dateString = queryDate.toISOString().split('T')[0];
+        return res.json({
+          period: filterPeriod,
+          date: dateString,
+          data: [],
+          message: "Cannot view attendance for future dates. Please select today's date or a past date."
+        });
+      }
+    }
+    
+    // For monthly view: Don't allow future months
+    if (filterPeriod === "monthly") {
+      const selectedMonth = new Date(queryDate.getFullYear(), queryDate.getMonth(), 1);
+      const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      if (selectedMonth > currentMonth) {
+        return res.json({
+          period: filterPeriod,
+          date: queryDate.toISOString().split('T')[0],
+          data: [],
+          message: "Cannot view attendance for future months. Please select current month or a past month."
+        });
+      }
+    }
+    
+    // For yearly view: Don't allow future years
+    if (filterPeriod === "yearly") {
+      const selectedYear = queryDate.getFullYear();
+      const currentYear = today.getFullYear();
+      if (selectedYear > currentYear) {
+        return res.json({
+          period: filterPeriod,
+          date: queryDate.toISOString().split('T')[0],
+          data: [],
+          message: "Cannot view attendance for future years. Please select current year or a past year."
+        });
+      }
+    }
+    
+    let dateFilter = {};
+    
+    if (filterPeriod === "daily") {
+      // Get attendance for a specific day
+      const dateString = queryDate.toISOString().split('T')[0];
+      dateFilter = { date: dateString };
+    } else if (filterPeriod === "monthly") {
+      // Get attendance for the entire month
+      const year = queryDate.getFullYear();
+      const month = queryDate.getMonth();
+      const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+      // Get last day of the month
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
       
-      return {
-        ...emp.toObject(),
-        attendance: attendance || null
-      };
-    });
+      // Find all dates in the month
+      const employees = await Employee.find();
+      const allAttendance = await Attendance.find({
+        date: { $gte: startDate, $lte: endDate }
+      });
+      
+      // If no attendance records found for this period, return empty array
+      if (allAttendance.length === 0) {
+        return res.json({
+          period: filterPeriod,
+          date: queryDate.toISOString().split('T')[0],
+          data: []
+        });
+      }
+      
+      // Group by employee and calculate summary
+      // Only include employees who have attendance records for this period
+      const result = employees
+        .map(emp => {
+          const empAttendance = allAttendance.filter(
+            att => att.employeeId.toString() === emp._id.toString()
+          );
+          
+          // If no attendance records for this period, return null (will be filtered out)
+          if (!empAttendance || empAttendance.length === 0) {
+            return null;
+          }
+          
+          const presentDays = empAttendance.filter(att => att.markIn).length;
+          const totalHours = empAttendance.reduce((sum, att) => sum + (att.totalHours || 0), 0);
+          
+          return {
+            employee: {
+              _id: emp._id,
+              firstName: emp.firstName,
+              lastName: emp.lastName,
+              email: emp.email,
+              phone: emp.phone,
+              department: emp.department,
+              employeeId: emp.employeeId
+            },
+            summary: {
+              totalDays: empAttendance.length,
+              presentDays: presentDays,
+              absentDays: empAttendance.length - presentDays,
+              totalHours: totalHours.toFixed(2)
+            },
+            attendance: empAttendance
+          };
+        })
+        .filter(item => item !== null && item.summary && item.summary.totalDays > 0); // Remove employees with no attendance data
+      
+      return res.json({
+        period: filterPeriod,
+        date: queryDate.toISOString().split('T')[0],
+        data: result
+      });
+    } else if (filterPeriod === "yearly") {
+      // Get attendance for the entire year
+      const year = queryDate.getFullYear();
+      const startDate = `${year}-01-01`;
+      const endDate = `${year}-12-31`;
+      
+      const employees = await Employee.find();
+      const allAttendance = await Attendance.find({
+        date: { $gte: startDate, $lte: endDate }
+      });
+      
+      // If no attendance records found for this period, return empty array
+      if (allAttendance.length === 0) {
+        return res.json({
+          period: filterPeriod,
+          date: queryDate.toISOString().split('T')[0],
+          data: []
+        });
+      }
+      
+      // Group by employee and calculate summary
+      // Only include employees who have attendance records for this period
+      const result = employees
+        .map(emp => {
+          const empAttendance = allAttendance.filter(
+            att => att.employeeId.toString() === emp._id.toString()
+          );
+          
+          // If no attendance records for this period, return null (will be filtered out)
+          if (!empAttendance || empAttendance.length === 0) {
+            return null;
+          }
+          
+          const presentDays = empAttendance.filter(att => att.markIn).length;
+          const totalHours = empAttendance.reduce((sum, att) => sum + (att.totalHours || 0), 0);
+          
+          return {
+            employee: {
+              _id: emp._id,
+              firstName: emp.firstName,
+              lastName: emp.lastName,
+              email: emp.email,
+              phone: emp.phone,
+              department: emp.department,
+              employeeId: emp.employeeId
+            },
+            summary: {
+              totalDays: empAttendance.length,
+              presentDays: presentDays,
+              absentDays: empAttendance.length - presentDays,
+              totalHours: totalHours.toFixed(2)
+            },
+            attendance: empAttendance
+          };
+        })
+        .filter(item => item !== null && item.summary && item.summary.totalDays > 0); // Remove employees with no attendance data
+      
+      return res.json({
+        period: filterPeriod,
+        date: queryDate.toISOString().split('T')[0],
+        data: result
+      });
+    }
     
-    res.json(employeesWithAttendance);
+    // Daily view - return single day attendance
+    const dateString = queryDate.toISOString().split('T')[0];
+    const employees = await Employee.find();
+    const attendanceRecords = await Attendance.find({ date: dateString });
+    
+    // If no attendance records found for this date, return empty array
+    if (attendanceRecords.length === 0) {
+      return res.json({
+        period: filterPeriod,
+        date: dateString,
+        data: []
+      });
+    }
+    
+    // Map attendance to employees - only show employees who have attendance for this date
+    const employeesWithAttendance = employees
+      .map(emp => {
+        const attendance = attendanceRecords.find(
+          att => att.employeeId.toString() === emp._id.toString()
+        );
+        
+        // Only include employees who have attendance record for this date
+        if (!attendance) {
+          return null;
+        }
+        
+        return {
+          employee: {
+            _id: emp._id,
+            firstName: emp.firstName,
+            lastName: emp.lastName,
+            email: emp.email,
+            phone: emp.phone,
+            department: emp.department,
+            employeeId: emp.employeeId
+          },
+          attendance: attendance
+        };
+      })
+      .filter(item => item !== null); // Remove employees with no attendance data
+    
+    res.json({
+      period: filterPeriod,
+      date: dateString,
+      data: employeesWithAttendance
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to fetch employees attendance!" });

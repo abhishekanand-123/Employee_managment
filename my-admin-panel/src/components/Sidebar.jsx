@@ -210,6 +210,13 @@ export default function Sidebar() {
         </li>
 
         <li className="nav-item">
+          <Link className="nav-link" to="/attendance">
+            <i className="typcn typcn-calendar menu-icon"></i>
+            <span className="menu-title">Attendance</span>
+          </Link>
+        </li>
+
+        <li className="nav-item">
           <a className="nav-link" href="#">
             <i className="typcn typcn-mortar-board menu-icon"></i>
             <span className="menu-title">Documentation</span>
