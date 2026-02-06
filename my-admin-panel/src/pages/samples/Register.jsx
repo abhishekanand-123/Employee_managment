@@ -50,7 +50,8 @@ function Register() {
             password: form.password
           });
 
-          // Step 3: Save token and redirect to dashboard
+          // Step 3: Save token and redirect to dashboard 
+          
           localStorage.setItem("token", loginRes.data.token);
           alert("Admin registered and logged in successfully!");
           
