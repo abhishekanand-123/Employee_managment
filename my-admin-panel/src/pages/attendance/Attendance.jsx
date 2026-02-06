@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import YearFilter from "./YearFilter";
+import MonthFilter from "./MonthFilter";
+import DayFilter from "./DayFilter";
 
 function Attendance() {
+  // Get today's date as default using local timezone
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [period, setPeriod] = useState("daily");
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // New filter states
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedDay, setSelectedDay] = useState(getTodayDate());
 
   useEffect(() => {
     // Automatically fetch data when period or date changes
@@ -110,6 +127,42 @@ function Attendance() {
     return `${firstName || ""} ${lastName || ""}`.trim();
   };
 
+  // Handler for year filter
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+    setSelectedMonth(""); // Reset month when year changes
+    setSelectedDay(""); // Reset day when year changes
+    setPeriod("yearly");
+    // Set date to January 1st of the selected year
+    const newDate = `${year}-01-01`;
+    setSelectedDate(newDate);
+  };
+
+  // Handler for month filter
+  const handleMonthChange = (month) => {
+    setSelectedMonth(month);
+    setSelectedDay(""); // Reset day when month changes
+    setPeriod("monthly");
+    // Use selected year or current year
+    const currentYear = new Date().getFullYear();
+    const year = selectedYear || currentYear;
+    // Update selectedYear if it wasn't set
+    if (!selectedYear) {
+      setSelectedYear(currentYear);
+    }
+    // Set date to the 1st of the selected month
+    const monthStr = String(month).padStart(2, "0");
+    const newDate = `${year}-${monthStr}-01`;
+    setSelectedDate(newDate);
+  };
+
+  // Handler for day filter
+  const handleDayChange = (day) => {
+    setSelectedDay(day);
+    setPeriod("daily");
+    setSelectedDate(day);
+  };
+
   return (
     <>
       <div className="row">
@@ -121,39 +174,24 @@ function Attendance() {
                 View attendance records for all employees
               </p>
 
-              {/* Filters */}
+              {/* Filter Components */}
               <div className="row mb-4">
-                <div className="col-md-4">
-                  <label className="form-label">Period</label>
-                  <select
-                    className="form-select"
-                    value={period}
-                    onChange={(e) => {
-                      setPeriod(e.target.value);
-                      // Data will be fetched automatically via useEffect
-                    }}
-                  >
-                    <option value="daily">Daily</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
-                </div>
-                <div className="col-md-4">
-                  <label className="form-label">Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={selectedDate}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        setSelectedDate(e.target.value);
-                      }
-                    }}
-                    min="2020-01-01"
-                    max="2099-12-31"
-                  />
-                </div>
-                <div className="col-md-4 d-flex align-items-end">
+                <YearFilter 
+                  selectedYear={selectedYear} 
+                  onYearChange={handleYearChange} 
+                />
+                <MonthFilter 
+                  selectedMonth={selectedMonth} 
+                  onMonthChange={handleMonthChange} 
+                />
+                <DayFilter 
+                  selectedDay={selectedDay} 
+                  onDayChange={handleDayChange} 
+                />
+              </div>
+              
+              <div className="row mb-4">
+                <div className="col-md-12 d-flex justify-content-end">
                   <button
                     className="btn btn-primary"
                     onClick={fetchAttendance}
