@@ -24,10 +24,19 @@ function EmployeeList() {
           Authorization: `Bearer ${token}`
         }
       });
-      setEmployees(res.data);
+      // API returns { period, date, data: [...] } - use data array
+      const rawData = res.data?.data;
+      const list = Array.isArray(rawData) ? rawData : [];
+      // Normalize: API items are { employee: {...}, attendance: {...} }, flatten for table
+      const normalized = list.map((item) => ({
+        ...(item.employee || item),
+        attendance: item.attendance ?? null
+      }));
+      setEmployees(normalized);
       setLoading(false);
     } catch (err) {
       console.error("Failed to fetch employees with attendance:", err);
+      setEmployees([]);
       if (err.response?.status === 401) {
         alert("Session expired! Please login again.");
         localStorage.removeItem("token");
@@ -137,7 +146,8 @@ function EmployeeList() {
     }
   };
 
-  const filteredEmployees = employees.filter((emp) => {
+  const employeeList = Array.isArray(employees) ? employees : [];
+  const filteredEmployees = employeeList.filter((emp) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       emp.firstName?.toLowerCase().includes(searchLower) ||
@@ -166,7 +176,7 @@ function EmployeeList() {
         <div>
           <h3 className="page-title">Employee Management & Attendance</h3>
           <p className="text-muted mb-0">
-            Total Employees: {employees.length} | Date: {todayDate} | Auto-refreshes every 10 seconds
+            Total Employees: {employeeList.length} | Date: {todayDate} | Auto-refreshes every 10 seconds
           </p>
         </div>
         <div>
