@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LEAVE_TYPES = [
   { value: "sick", label: "Sick Leave" },
@@ -8,6 +9,7 @@ const LEAVE_TYPES = [
 ];
 
 function AddLeave() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     leaveType: "sick",
     startDate: "",
@@ -30,9 +32,14 @@ function AddLeave() {
       alert("Please select start and end date.");
       return;
     }
+    const token = localStorage.getItem("employeeToken");
+    if (!token) {
+      alert("You are not logged in as employee. Please log in from the Employee Login page.");
+      navigate("/employee/login");
+      return;
+    }
     setLoading(true);
     try {
-      const token = localStorage.getItem("employeeToken");
       await axios.post(
         "http://localhost:5000/api/leave/apply",
         {
@@ -46,6 +53,13 @@ function AddLeave() {
       alert("Leave request submitted successfully!");
       setForm({ leaveType: "sick", startDate: "", endDate: "", reason: "" });
     } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem("employeeToken");
+        localStorage.removeItem("employeeData");
+        alert("Session expired or invalid. Please log in again as employee.");
+        navigate("/employee/login");
+        return;
+      }
       alert(err.response?.data?.message || "Failed to submit leave request.");
     } finally {
       setLoading(false);
