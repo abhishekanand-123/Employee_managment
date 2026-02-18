@@ -367,9 +367,17 @@ function Attendance() {
                                   )}
                                 </td>
                                 <td>
-                                  {attendance?.totalHours > 0 ? (
+                                  {attendance?.markOut ? (
                                     <span className="badge badge-info">
-                                      {attendance.totalHours.toFixed(2)} hrs
+                                      {(
+                                        typeof attendance.totalHours === "number"
+                                          ? attendance.totalHours
+                                          : attendance?.markIn?.timestamp && attendance?.markOut?.timestamp
+                                            ? (new Date(attendance.markOut.timestamp) - new Date(attendance.markIn.timestamp)) /
+                                              (1000 * 60 * 60)
+                                            : 0
+                                      ).toFixed(2)}{" "}
+                                      hrs
                                     </span>
                                   ) : attendance?.markIn && attendance?.markIn.timestamp ? (
                                     <span className="badge badge-info">
