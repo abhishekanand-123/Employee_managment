@@ -36,3 +36,56 @@
     transform: rotate(360deg);
   }
 }
+
+/* Shared calendar (employee + admin leave calendar) */
+.employee-calendar {
+  font-size: 14px;
+}
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+.calendar-weekday {
+  text-align: center;
+  padding: 8px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.calendar-cell {
+  min-height: 80px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px;
+  background: #fafafa;
+}
+.calendar-cell.other-month {
+  background: #f0f0f0;
+  opacity: 0.6;
+}
+.calendar-day-num {
+  font-weight: 600;
+  color: #333;
+}
+.calendar-day-leaves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.calendar-leave-dot {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

@@ -103,12 +103,6 @@ function EmployeeDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("employeeToken");
-    localStorage.removeItem("employeeData");
-    navigate("/employee/login");
-  };
-
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', { 
       hour: '2-digit', 
@@ -152,23 +146,6 @@ function EmployeeDashboard() {
 
   return (
     <div className="employee-dashboard-container">
-      {/* Simple Header */}
-      <div className="dashboard-header mb-4">
-        <div className="d-flex justify-content-between align-items-center">
-          <div>
-            <h4 className="mb-1">Welcome, {employee?.firstName} {employee?.lastName}</h4>
-            <p className="text-muted mb-0">
-              <i className="mdi mdi-clock me-1"></i>
-              {formatTime(currentTime)} • {formatDate(currentTime)}
-            </p>
-          </div>
-          <button className="btn btn-outline-danger btn-sm" onClick={handleLogout}>
-            <i className="mdi mdi-logout me-1"></i>
-            Logout
-          </button>
-        </div>
-      </div>
-
       {/* Mark In and Mark Out Section - Centered */}
       <div className="row justify-content-center">
         <div className="col-lg-8">

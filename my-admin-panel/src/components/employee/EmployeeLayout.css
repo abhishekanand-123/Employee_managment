@@ -1,0 +1,154 @@
+.employee-app-wrapper {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.employee-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px 24px;
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.employee-body {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+.employee-sidebar-wrap {
+  width: 260px;
+  flex-shrink: 0;
+  background: white;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+}
+
+.employee-sidebar .nav {
+  padding: 16px 0;
+}
+
+.employee-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #4a4a4a;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+
+.employee-sidebar .nav-link:hover {
+  background: #f8f9fa;
+  color: #667eea;
+}
+
+.employee-sidebar .nav-link.active {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border-left-color: #667eea;
+  font-weight: 600;
+}
+
+.employee-sidebar .menu-icon {
+  font-size: 22px;
+  margin-right: 12px;
+  opacity: 0.9;
+}
+
+.employee-sidebar .menu-title {
+  font-size: 15px;
+}
+
+.employee-content {
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+}
+
+@media (max-width: 768px) {
+  .employee-body {
+    flex-direction: column;
+  }
+
+  .employee-sidebar-wrap {
+    width: 100%;
+  }
+
+  .employee-sidebar .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 12px;
+  }
+
+  .employee-sidebar .nav-link {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+
+  .employee-sidebar .nav-link.active {
+    border-left: none;
+    border-bottom-color: #667eea;
+  }
+}
+
+/* Employee Leave Calendar */
+.employee-calendar {
+  font-size: 14px;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+
+.calendar-weekday {
+  text-align: center;
+  padding: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-cell {
+  min-height: 80px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px;
+  background: #fafafa;
+}
+
+.calendar-cell.other-month {
+  background: #f0f0f0;
+  opacity: 0.6;
+}
+
+.calendar-day-num {
+  font-weight: 600;
+  color: #333;
+}
+
+.calendar-day-leaves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.calendar-leave-dot {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

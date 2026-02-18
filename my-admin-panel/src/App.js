@@ -18,7 +18,13 @@ import EmployeeList from "./pages/employees/EmployeeList";
 import EditEmployee from "./pages/employees/EditEmployee";
 import EmployeeLogin from "./pages/employee/EmployeeLogin";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
+import EmployeeLayout from "./components/employee/EmployeeLayout";
+import AddLeave from "./pages/employee/AddLeave";
+import MyLeaveRequests from "./pages/employee/MyLeaveRequests";
+import EmployeeLeaveCalendar from "./pages/employee/EmployeeLeaveCalendar";
 import Attendance from "./pages/attendance/Attendance";
+import AdminLeaveRequests from "./pages/admin/AdminLeaveRequests";
+import AdminLeaveCalendar from "./pages/admin/AdminLeaveCalendar";
 
 import "./App.css";
 
@@ -30,9 +36,16 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Employee Routes (without admin layout) */}
+        {/* Employee login - standalone */}
         <Route path="/employee/login" element={<EmployeeLogin />} />
-        <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+        {/* Employee routes with sidebar layout */}
+        <Route path="/employee" element={<EmployeeLayout />}>
+          <Route index element={<EmployeeDashboard />} />
+          <Route path="dashboard" element={<EmployeeDashboard />} />
+          <Route path="leave/add" element={<AddLeave />} />
+          <Route path="leave/requests" element={<MyLeaveRequests />} />
+          <Route path="leave/calendar" element={<EmployeeLeaveCalendar />} />
+        </Route>
 
         {/* Admin Routes (with admin layout) */}
         <Route path="/*" element={
@@ -63,6 +76,8 @@ function App() {
                 <Route path="/employee-list" element={<EmployeeList />} />
                 <Route path="/edit-employee/:id" element={<EditEmployee />} />
                 <Route path="/attendance" element={<Attendance />} />
+                <Route path="/leave-requests" element={<AdminLeaveRequests />} />
+                <Route path="/leave-calendar" element={<AdminLeaveCalendar />} />
 
               </Routes>
 

@@ -217,6 +217,20 @@ export default function Sidebar() {
         </li>
 
         <li className="nav-item">
+          <Link className="nav-link" to="/leave-requests">
+            <i className="typcn typcn-document-text menu-icon"></i>
+            <span className="menu-title">Leave Requests</span>
+          </Link>
+        </li>
+
+        <li className="nav-item">
+          <Link className="nav-link" to="/leave-calendar">
+            <i className="typcn typcn-calendar-outline menu-icon"></i>
+            <span className="menu-title">Leave Calendar</span>
+          </Link>
+        </li>
+
+        <li className="nav-item">
           <a className="nav-link" href="#">
             <i className="typcn typcn-mortar-board menu-icon"></i>
             <span className="menu-title">Documentation</span>

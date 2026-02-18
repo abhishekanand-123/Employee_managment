@@ -21,6 +21,12 @@ app.use("/api/attendance", require("./routes/attendanceRoutes"));
 // Admin Attendance Routes (for admin to manage attendance)
 app.use("/api/admin/attendance", require("./routes/adminAttendanceRoutes"));
 
+// Leave Routes (employee: apply, my leaves, my calendar)
+app.use("/api/leave", require("./routes/leaveRoutes"));
+
+// Admin Leave Routes (admin: list, approve, reject, calendar)
+app.use("/api/admin/leave", require("./routes/adminLeaveRoutes"));
+
 // MongoDB Connection
 mongoose
   .connect("mongodb://localhost:27017/admin_portal")
