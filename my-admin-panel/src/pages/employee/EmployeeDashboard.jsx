@@ -208,7 +208,7 @@ function EmployeeDashboard() {
                           Marked at {attendance.markOut.time}
                         </span>
                       ) : attendance?.markIn ? (
-                        <small className="text-muted d-block">After 9 hours from mark-in</small>
+                        <small className="text-muted d-block">You can mark out any time after mark-in</small>
                       ) : (
                         <small className="text-muted d-block">Mark in first</small>
                       )}

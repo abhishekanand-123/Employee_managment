@@ -371,6 +371,15 @@ function Attendance() {
                                     <span className="badge badge-info">
                                       {attendance.totalHours.toFixed(2)} hrs
                                     </span>
+                                  ) : attendance?.markIn && attendance?.markIn.timestamp ? (
+                                    <span className="badge badge-info">
+                                      {Math.max(
+                                        0,
+                                        (new Date() - new Date(attendance.markIn.timestamp)) /
+                                          (1000 * 60 * 60)
+                                      ).toFixed(2)}{" "}
+                                      hrs
+                                    </span>
                                   ) : attendance?.markIn ? (
                                     <span className="text-muted">In Progress</span>
                                   ) : (

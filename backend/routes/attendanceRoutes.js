@@ -76,7 +76,7 @@ router.post("/mark-in", verifyEmployee, async (req, res) => {
   }
 });
 
-// Mark Out - Employee can mark out after 9 hours
+// Mark Out - Employee can mark out any time after mark-in
 router.post("/mark-out", verifyEmployee, async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -105,31 +105,19 @@ router.post("/mark-out", verifyEmployee, async (req, res) => {
     const markInTime = new Date(attendance.markIn.timestamp);
     const hoursWorked = (now - markInTime) / (1000 * 60 * 60); // Convert to hours
 
-    // Check if 9 hours have passed
-    const hasWorked9Hours = hoursWorked >= 9;
+    attendance.markOut = {
+      time: currentTime,
+      timestamp: now
+    };
+    attendance.totalHours = parseFloat(hoursWorked.toFixed(2));
+    await attendance.save();
 
-    if (hasWorked9Hours) {
-      attendance.markOut = {
-        time: currentTime,
-        timestamp: now
-      };
-      attendance.totalHours = parseFloat(hoursWorked.toFixed(2));
-      await attendance.save();
-
-      res.json({
-        message: "Marked out successfully!",
-        attendance: attendance,
-        markOutTime: currentTime,
-        totalHours: attendance.totalHours
-      });
-    } else {
-      const remainingHours = (9 - hoursWorked).toFixed(2);
-      return res.status(400).json({
-        message: `You need to complete 9 hours shift. Remaining: ${remainingHours} hours. Current time: ${currentTime}`,
-        hoursWorked: hoursWorked.toFixed(2),
-        remainingHours: remainingHours
-      });
-    }
+    res.json({
+      message: "Marked out successfully!",
+      attendance: attendance,
+      markOutTime: currentTime,
+      totalHours: attendance.totalHours
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to mark out!" });

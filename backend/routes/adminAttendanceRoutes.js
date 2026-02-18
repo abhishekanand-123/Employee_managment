@@ -269,19 +269,6 @@ router.post("/mark-out/:employeeId", verifyAdmin, async (req, res) => {
     const markInTime = new Date(attendance.markIn.timestamp);
     const hoursWorked = (now - markInTime) / (1000 * 60 * 60);
 
-    // Check if 9 hours have been completed
-    const hasWorked9Hours = hoursWorked >= 9;
-    
-    if (!hasWorked9Hours) {
-      const remainingHours = (9 - hoursWorked).toFixed(2);
-      return res.status(400).json({
-        message: `Employee needs to complete 9 hours shift. Currently worked: ${hoursWorked.toFixed(2)} hours. Remaining: ${remainingHours} hours.`,
-        hoursWorked: hoursWorked.toFixed(2),
-        remainingHours: remainingHours,
-        markInTime: attendance.markIn.time
-      });
-    }
-
     attendance.markOut = {
       time: currentTime,
       timestamp: now
